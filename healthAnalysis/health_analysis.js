@@ -39,6 +39,40 @@ function resetForm() {
   clearGender();
 }
 
+function searchCondition() {
+  const input = getElement("conditionInput").value.toLowerCase();
+  const resultDiv = getElement("result");
+  resultDiv.innerHTML = "";
+
+  fetch("health_analysis.json")
+    .then((response) => response.json())
+    .then((data) => {
+      const condition = data.conditions.find(
+        (item) => item.name.toLowerCase() === input,
+      );
+
+      if (!condition) {
+        resultDiv.innerHTML = "Condition no found.";
+        return;
+      }
+
+      const symptoms = condition.symptoms.join(", ");
+      const prevention = condition.prevention.join(", ");
+      const treatment = condition.treatment;
+
+      resultDiv.innerHTML += `<h2>${condition.name}</h2>`;
+      resultDiv.innerHTML += `<img src="./${condition.imagesrc}" alt="hjh">`;
+
+      resultDiv.innerHTML += `<p><strong>Symptoms:</strong> ${symptoms}</p>`;
+      resultDiv.innerHTML += `<p><strong>Prevention:</strong> ${prevention}</p>`;
+      resultDiv.innerHTML += `<p><strong>Treatment:</strong> ${treatment}</p>`;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      resultDiv.innerHTML = "An error occurred while fetching data.";
+    });
+}
+
 function generateReport() {
   const numPatients = patients.length;
   const conditionsCount = {
@@ -82,3 +116,4 @@ function generateReport() {
 }
 
 addPatientButton.addEventListener("click", addPatient);
+btnSearch.addEventListener("click", searchCondition);
